@@ -5,6 +5,7 @@ dotenv.config();
 import app from "./app.js";
 import { connectDB, client } from "./config/db.js";
 import { Request, Response } from "express"; 
+import { error } from "node:console";
 
 const PORT = process.env.PORT || 5000;
 
@@ -15,13 +16,35 @@ const startServer = async () => {
   const db = client.db(process.env.DATABASE_NAME);
 
   const userCollection = db.collection("user");
-
+ const aipostCollection = db.collection("aipost");
 
 
   app.get("/user", async (req: Request, res: Response) => {    
     const result = await userCollection.find().toArray();      
     res.json(result);
   });
+
+// app.post("/aipost", async (req: Request, res: Response) => {
+//    console.log("POST /aipost HIT");
+//   const requestData = req.body;
+//   const result = await aipostCollection.insertOne(requestData);
+//   res.json(result);
+// });
+
+app.post("/aipost", async (req, res) => {
+  const body = req.body;
+
+  const result = await aipostCollection.insertOne(body);
+
+  res.send(result);
+});
+
+
+
+
+
+
+
 
 
 
