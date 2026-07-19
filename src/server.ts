@@ -99,6 +99,14 @@ app.post("/aipost", async (req, res) => {
   });
 
 
+  app.get("/aipost/published/:id", async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await aipostCollection.findOne({
+      _id: new ObjectId(id as string),
+      status: "published",
+    });
+    res.json(result);
+  });
 
 
 
