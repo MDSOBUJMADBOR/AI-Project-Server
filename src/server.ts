@@ -58,7 +58,7 @@ app.post("/aipost", async (req, res) => {
 
 
  app.get("/aipost/published/four", async (req: Request, res: Response) => {
-    const result = await aipostCollection.find({ status: "unpublished" }).limit(4).toArray();
+    const result = await aipostCollection.find({ status: "published" }).limit(4).toArray();
     res.json(result);
   });
 
