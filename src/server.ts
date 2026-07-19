@@ -42,6 +42,12 @@ app.post("/aipost", async (req, res) => {
 
 
 
+ app.get("/aipost/email/:email", async (req: Request, res: Response) => {
+    const { email } = req.params;
+    const result = await aipostCollection.find({ email }).toArray();
+    res.json(result);
+  });
+
 
 
 
