@@ -6,6 +6,7 @@ import app from "./app.js";
 import { connectDB, client } from "./config/db.js";
 import { Request, Response } from "express"; 
 import { error } from "node:console";
+import { ObjectId } from "mongodb";
 
 const PORT = process.env.PORT || 5000;
 
@@ -47,6 +48,59 @@ app.post("/aipost", async (req, res) => {
     const result = await aipostCollection.find({ email }).toArray();
     res.json(result);
   });
+
+   app.delete("/aipost/:id", async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const result = await aipostCollection.deleteOne({ _id: new ObjectId(id as string) });
+    res.json(result);
+  });
+
+
+
+ app.get("/aipost/published/four", async (req: Request, res: Response) => {
+    const result = await aipostCollection.find({ status: "unpublished" }).limit(4).toArray();
+    res.json(result);
+  });
+
+    app.get("/aipost/published", async (req: Request, res: Response) => {
+    const { page = 1, limit = 8 } = req.query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const result = await aipostCollection
+      .find({ status: "published" })
+      .skip(skip)
+      .limit(limitNumber)
+      .toArray();
+
+    const total = await aipostCollection.countDocuments({
+      status: "published",
+    });
+
+    const totalPage = Math.ceil(total / limitNumber);
+
+    console.log({
+      data: result,
+      page: pageNumber,
+      totalPage,
+      total,
+    });
+
+    res.json({
+      total,
+      totalPage,
+      page: pageNumber,
+      limit: limitNumber,
+      
+      data: result,
+    });
+  });
+
+
+
+
 
 
 
