@@ -4,11 +4,38 @@ dotenv.config();
 // ✅ FIX: NodeNext এর নিয়ম অনুযায়ী লোকাল ইম্পোর্টে .js এক্সটেনশন যুক্ত করা হয়েছে
 import app from "./app.js";
 import { connectDB, client } from "./config/db.js";
-import { Request, Response } from "express"; 
-import { error } from "node:console";
+import { Request, Response ,NextFunction} from "express"; 
+import { createRemoteJWKSet, jwtVerify } from "jose-cjs";
 import { ObjectId } from "mongodb";
 
 const PORT = process.env.PORT || 5000;
+
+
+const JWKS = createRemoteJWKSet(new URL(`${process.env.CLIENT_URL}/api/auth/jwks`));
+
+// ✅ Middleware-এ সঠিক টাইপ ডিফাইন করা হলো
+const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req?.headers.authorization;
+ 
+  if (!authHeader) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  const token = authHeader.split(" ")[1];
+  
+  if (!token) {
+    return res.status(401).json({ message: "Unauthorized" }); 
+  }
+
+  try {
+    const { payload } = await jwtVerify(token, JWKS);
+    (req as any).user = payload; 
+
+    next();
+  } catch (error) {
+    return res.status(403).json({ message: "Forbidden" }); 
+  }
+};
+
 
 
 const startServer = async () => {
