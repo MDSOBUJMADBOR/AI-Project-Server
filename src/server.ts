@@ -52,18 +52,10 @@ const startServer = async () => {
     res.json(result);
   });
 
-// app.post("/aipost", async (req: Request, res: Response) => {
-//    console.log("POST /aipost HIT");
-//   const requestData = req.body;
-//   const result = await aipostCollection.insertOne(requestData);
-//   res.json(result);
-// });
 
-app.post("/aipost", async (req, res) => {
+app.post("/aipost", async (req:Request, res:Response) => {
   const body = req.body;
-
   const result = await aipostCollection.insertOne(body);
-
   res.send(result);
 });
 
